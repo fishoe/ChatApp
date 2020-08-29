@@ -31,7 +31,8 @@
         console.log(JSON.parse(evt.data))
         data = JSON.parse(evt.data)
         count = data.count
-        msg = "".concat(data.name, "님 : ", data.msg, "         경고", count)
+        score = data.score
+        msg = "".concat(data.name, "님 : ", data.msg, "     -> 해당발언 위험도: ", score, "         누적 경고", count)
 
         document.getElementById('chatbox').innerHTML += '\n';
         document.getElementById('chatbox').innerHTML += msg;

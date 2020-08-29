@@ -1,9 +1,7 @@
 from django.test import TestCase
 
 # Create your tests here.
-import json
+import os
+import sys
 
-text = '{"a":"abc", "c":"cba"}'
-
-a = json.loads(text)
-print(a)
+#sys.path.append(os.path.dirname(os.path.abspath(os.path.dirname(__file__))))
