@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>TT</title>
+    <script type="text/javascript">
+    var connect
+
+    var count = 0
+
+    window.addEventListener('load', function(){
+        connect = new WebSocket('ws://localhost:8000/');
+
+        connect.onopen = function(evt){onOpen(evt)};
+        connect.onclose = function(evt){onClose(evt)};
+        connect.onmessage = function(evt){onMessage(evt)};
+        connect.onerror = function(evt){onError(evt)};
+    })
+
+
+    function onOpen(evt){
+        console.log(evt.data);
+    }
+    function onClose(evt){
+        console.log(evt.data);
+    }
+    function onMessage(evt)
+    {
+        data = evt.data;
+        console.log(data);
+        console.log(JSON.parse(evt.data))
+        data = JSON.parse(evt.data)
+        if (data.status == 'text'){
+            msg = "".concat(data.name, "님 : ", data.msg)
+            document.getElementById('chatbox').innerHTML += '\n';
+            document.getElementById('chatbox').innerHTML += msg;
+        }else if(data.status == 'mute'){
+            
+            alert("부적절한 발언으로 인해 일시적으로 채팅이 금지됩니다.")
+            document.getElementById('btn').onclick = "";
+            document.getElementById('btn').disabled = true;
+            document.getElementById('message').readOnly = true;
+            console.log("timer on")
+            setTimeout(function(){
+                document.getElementById('btn').onclick = "sendBtn()";
+                document.getElementById('btn').disabled = false;
+                document.getElementById('message').readOnly = false;
+                console.log("timeout",5*data.count*data.count*1000)
+            }, 5*data.count*data.count*1000);
+        }
+    }
+
+    function checkBlockUser(){
+        console.log("{{user.blocked}}");
+        if (count > 2){
+            return true
+        }else{
+            return false
+        }
+    }
+
+    function sendBtn()
+    {
+        if(false){ //if(checkBlockUser())
+            document.getElementById('message').value = "너 차단";
+            document.getElementById('message').readOnly = true;
+            document.getElementById('btn').onclick = "";
+            document.getElementById('btn').disabled = true;
+        }else{
+            text = document.getElementById('message').value;
+            id = "{{ user.name }}"
+            msg = {"text":text, "id":id}
+            connect.send(JSON.stringify(msg));
+            document.getElementById('message').value='';
+        }
+    }
+
+    function enterTextEdit()
+    {
+        if(document.getElementById('message').value == ""){
+            return
+        }
+        if(event.keyCode == 13){
+            sendBtn()
+        }
+    }
+
+    
+</script>
+</head>
+<body>
+<textarea id='chatbox' cols="100" rows="30"> </textarea><br>
+<input type="text" id="message" onkeydown="enterTextEdit()"> <input type="button" value="send" id="btn" onclick="sendBtn()">
+</body>
+
+</html>
